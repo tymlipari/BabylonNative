@@ -1,10 +1,6 @@
 #include "AppRuntime.h"
 
-#ifndef __clang__
-#pragma warning(disable : 4100 4267)
-#endif
-#include <v8.h>
-#include <libplatform/libplatform.h>
+#include "v8/V8Inc.h"
 
 namespace Babylon
 {
@@ -28,6 +24,11 @@ namespace Babylon
                 v8::V8::ShutdownPlatform();
             }
 
+            static Module& Instance()
+            {
+                return *s_module;
+            }
+
             static void Initialize(const char* executablePath)
             {
                 if (s_module == nullptr)
@@ -35,6 +36,8 @@ namespace Babylon
                     s_module = std::make_unique<Module>(executablePath);
                 }
             }
+
+            v8::Platform* Platform() const { return m_platform.get(); }
 
         private:
             std::unique_ptr<v8::Platform> m_platform;
