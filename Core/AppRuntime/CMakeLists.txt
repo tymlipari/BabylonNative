@@ -8,6 +8,25 @@ if(NOT NAPI_JAVASCRIPT_ENGINE STREQUAL "JSI")
         "Source/WorkQueue.cpp"
         "Source/WorkQueue.h")
 
+    if (NAPI_JAVASCRIPT_ENGINE STREQUAL "V8")
+        set(SOURCES ${SOURCES}
+            "Source/v8/llhttp_api.c"
+            "Source/v8/llhttp_http.c"
+            "Source/v8/llhttp.h"
+            "Source/v8/llhttp.c"
+            "Source/v8/V8Inc.h"
+            "Source/v8/V8InspectorAgent.h"
+            "Source/v8/V8InspectorAgent.cpp"
+            "Source/v8/V8InspectorSocket.h"
+            "Source/v8/V8InspectorSocket.cpp"
+            "Source/v8/V8InspectorSocketServer.h"
+            "Source/v8/V8InspectorSocketServer.cpp"
+            "Source/v8/V8InspectorTCP.h"
+            "Source/v8/V8InspectorTCP.cpp"
+            "Source/v8/V8InspectorUtils.h"
+            "Source/v8/V8InspectorUtils.cpp")
+    endif()
+
     add_library(AppRuntime ${SOURCES})
     warnings_as_errors(AppRuntime)
 
@@ -17,6 +36,11 @@ if(NOT NAPI_JAVASCRIPT_ENGINE STREQUAL "JSI")
 
     if(UNIX AND NOT APPLE AND NOT ANDROID)
         target_include_directories(AppRuntime INTERFACE "/usr/include/webkitgtk-4.0/")
+    endif()
+
+    if (NAPI_JAVASCRIPT_ENGINE STREQUAL "V8")
+        target_link_to_dependencies(AppRuntime PRIVATE asio)
+        target_compile_definitions(AppRuntime PRIVATE ASIO_STANDALONE)
     endif()
 
     target_link_to_dependencies(AppRuntime
